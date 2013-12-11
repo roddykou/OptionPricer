@@ -11,12 +11,15 @@ public class Main {
 			public void run() {
 //				LoginPage p = new LoginPage();
 //				p.display();
-
+				
+				OptionPricerPage p = new OptionPricerPage();
+				p.display();
+				
 //				NewAlgorithmPage p = new NewAlgorithmPage();
 //				p.display();
 				
-				NewOptionPage p = new NewOptionPage();
-				p.display();
+//				NewOptionPage p = new NewOptionPage();
+//				p.display();
 			}
 		});
 
