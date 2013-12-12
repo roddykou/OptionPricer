@@ -19,6 +19,10 @@ public class OptionPricerPage {
 	private JRadioButton buttonCall = new JRadioButton("Call");
 	private JRadioButton buttonPut = new JRadioButton("Put");
 	private ButtonGroup buttonGroup = new ButtonGroup();
+	private JTextArea textResult = new JTextArea();
+	private String[] algorithms = { "B-S formula", "Binomial tree",
+			"Numerical integration", "Simulation" };
+	private JList listAlgorithms = new JList(algorithms);
 
 	public OptionPricerPage() {
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,9 +74,6 @@ public class OptionPricerPage {
 		JPanel paneAlgorithm = new JPanel();
 		paneAlgorithm.setBorder(BorderFactory.createTitledBorder("Algorithm"));
 
-		String[] algorithms = { "B-S formula", "Binomial tree",
-				"Numerical integration", "Simulation" };
-		JList listAlgorithms = new JList(algorithms);
 		paneAlgorithm.add(listAlgorithms);
 
 		JPanel paneButtons = new JPanel();
@@ -91,8 +92,9 @@ public class OptionPricerPage {
 		JPanel paneResults = new JPanel();
 		JPanel paneResult = new JPanel();
 		paneResult.setBorder(BorderFactory.createTitledBorder("Result"));
-		JTextField textResult = new JTextField();
-		textResult.setPreferredSize(new Dimension(150, 200));
+		textResult.setPreferredSize(new Dimension(300, 200));
+		textResult.setLineWrap(true);
+		textResult.setWrapStyleWord(true);
 		paneResult.add(textResult);
 
 		JPanel paneVolatilitySmile = new JPanel();
@@ -168,25 +170,31 @@ public class OptionPricerPage {
 			default:
 				break;
 			}
-			
+
 			option.setParas(txtStockTicker.getText(),
 					Double.parseDouble(txtStockPrice.getText()),
 					Double.parseDouble(txtStrikePrice.getText()),
 					Double.parseDouble(txtVolatility.getText()),
 					Double.parseDouble(txtRiskFreeRate.getText()),
 					Double.parseDouble(txtTerms.getText()));
-			
-//			BlackScholes black = new BlackScholes();
-//			System.out.println(black.eval(option));
-			
-//			Simulation simulation = new Simulation();
-//			System.out.println(simulation.eval(option));
-			
-			Binomial binomial = new Binomial();
-			System.out.println(binomial.eval(option));
+
+			Object[] selectedAlgorithm = listAlgorithms.getSelectedValues();
+			int numAlgorithms = selectedAlgorithm.length;
+			String results = "";
+
+			for (int i = 0; i < numAlgorithms; i++) {
+				if (selectedAlgorithm[i].toString().equals("B-S formula"))
+					results += "B-S formula: " + new BlackScholes().eval(option) + "\n";
+				else if (selectedAlgorithm[i].toString().equals("Binomial tree"))
+					results += "Binomial tree: " + new Binomial().eval(option) + "\n";
+				else if (selectedAlgorithm[i].toString().equals("Numerical integration"))
+					results += "Numerical integration: " + 0.0 + "\n";
+				else if (selectedAlgorithm[i].toString().equals("Simulation"))
+					results += "Simulation: " + new Simulation().eval(option) + "\n";
+			}
+
+			 textResult.setText(results);
 		}
-		
-		
 
 	}
 }
