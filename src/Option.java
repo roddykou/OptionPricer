@@ -6,23 +6,19 @@ public class Option {
 		
 	}
 
-	public Option(String stockTicker, double stockPrice, double strikePrice,
+	public Option(double stockPrice, double strikePrice,
 			double volatility, double riskFreeRate, double time) {
-		this.stockTicker = stockTicker;
 		this.stockPrice = stockPrice;
 		this.strikePrice = strikePrice;
-		// this.currency = currency;
 		this.volatility = volatility;
 		this.riskFreeRate = riskFreeRate;
 		this.time = time;
 	}
 	
-	public void setParas(String stockTicker, double stockPrice, double strikePrice,
+	public void setParas(double stockPrice, double strikePrice,
 			double volatility, double riskFreeRate, double time) {
-		this.stockTicker = stockTicker;
 		this.stockPrice = stockPrice;
 		this.strikePrice = strikePrice;
-		// this.currency = currency;
 		this.volatility = volatility;
 		this.riskFreeRate = riskFreeRate;
 		this.time = time;

@@ -1,9 +1,8 @@
+public class AsiaPut extends Put {
 
-public class AsiaPut extends Put{
-
-	public AsiaPut(String stockTicker, double stockPrice, double strikePrice,
-			double volatility, double riskFreeRate, double time) {
-		super(stockTicker, stockPrice, strikePrice, volatility, riskFreeRate, time);
+	public AsiaPut(double stockPrice, double strikePrice, double volatility,
+			double riskFreeRate, double time) {
+		super(stockPrice, strikePrice, volatility, riskFreeRate, time);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -11,5 +10,5 @@ public class AsiaPut extends Put{
 		// TODO Auto-generated constructor stub
 	}
 
-	public final static String[] validAlgos = {"Simulation" };
+	public final static String[] validAlgos = { "Simulation" };
 }

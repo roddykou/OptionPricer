@@ -11,18 +11,42 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 
 // jreechart Java Libaray is used to generate graphs
 // some code are reference from jreechart open source demo (http://stackoverflow.com/questions/16714738/xy-plotting-with-java)
 
-public class volatilitySmile extends ApplicationFrame {
+public class VolatilitySmile extends JFrame {
 
+	private static final long serialVersionUID = -5587627424958966103L;
 	static double Pi = 3.14159265358979;
 
-	public volatilitySmile(final String title) {
+	public VolatilitySmile(final String title, Option option) {
 
 		super(title);
+
+		// double stockPrice = option.getStockPrice();
+		// double strikePrice = option.getStrikePrice();
+		// double riskFreeRate = option.getRiskFreeRate();
+		// double time = option.getTime();
+		// boolean isCall = false;
+		// if (option instanceof Call)
+		// isCall = true;
+		//
+		// double[] strikePrices = new double[9];
+		// double interval = strikePrice / 10;
+		// strikePrices[0] = strikePrice - interval * 5;
+		// for (int i = 1; i < 9; i++)
+		// strikePrices[i] = strikePrices[i - 1] + interval;
+		//
+		// final XYSeries xyPairs = new XYSeries("Data From File");
+		// for (int i = 0; i < 9; i++) {
+		// option.setStrikePrice(strikePrices[i]);
+		// double implied = ImpliedVol(stockPrice, isCall, new
+		// Simulation().eval(option) , strikePrices[i], time, riskFreeRate);
+		// xyPairs.add(strikePrices[i], implied);
+		// System.out.println("" + strikePrices[i] + " " + implied);
+		// }
+
 		final XYSeries xyPairs = new XYSeries("Data From File");
 		File file = new File("graphData.txt");
 		Scanner scanner = null;
@@ -34,9 +58,9 @@ public class volatilitySmile extends ApplicationFrame {
 				String[] tokens = line.split(" ");
 				double s = Double.parseDouble(tokens[0]);
 				double o = Double.parseDouble(tokens[1]);
-				
-				// 
-				double implied = ImpliedVol(2.2, "Call", o, s, 0.5, 0.06);
+
+				//
+				double implied = ImpliedVol(2.2, true, o, s, 0.5, 0.06);
 				xyPairs.add(s, implied);
 			}
 		} catch (FileNotFoundException e) {
@@ -48,22 +72,22 @@ public class volatilitySmile extends ApplicationFrame {
 		}
 
 		final XYSeriesCollection dataFromFile = new XYSeriesCollection(xyPairs);
-		final JFreeChart chart = ChartFactory.createXYLineChart("Volatility Smile Graph",
-				"Strike Price", "Implied Volatility", dataFromFile, PlotOrientation.VERTICAL, true,
-				true, false);
+		final JFreeChart chart = ChartFactory.createXYLineChart(
+				"Volatility Smile Graph", "Strike Price", "Implied Volatility",
+				dataFromFile, PlotOrientation.VERTICAL, true, true, false);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
 		setContentPane(chartPanel);
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	}
 
 	// source:
 	// http://quantcorner.wordpress.com/2012/09/18/mplied-volatility-of-options-wit-vba-excel/
 	// the ImpliedVol method, pdf, and cdf methods are translated from VBA to
 	// Java according the the above web site
-	public static double ImpliedVol(double price, String option, double last, double strike,
-			double time, double rate) {
+	public static double ImpliedVol(double price, boolean isCall, double last,
+			double strike, double time, double rate) {
 		double X0 = 0;
 		double vol;
 		double d1;
@@ -82,10 +106,11 @@ public class volatilitySmile extends ApplicationFrame {
 
 			vega = last * Math.sqrt(time) * pdf(d1);
 
-			if (option.equals("Call"))
+			if (isCall)
 				X0 = last * cdf(d1) - strike * Math.exp(-rate * time) * cdf(d2);
 			else
-				X0 = strike * Math.exp(-rate * time) * cdf(-d2) - last * cdf(-d1);
+				X0 = strike * Math.exp(-rate * time) * cdf(-d2) - last
+						* cdf(-d1);
 
 			vol = vol - (X0 - price) / vega;
 

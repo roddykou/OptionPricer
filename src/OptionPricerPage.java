@@ -1,6 +1,14 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,7 +18,6 @@ import org.jfree.ui.RefineryUtilities;
 public class OptionPricerPage {
 
 	private JFrame jframe = new JFrame("Option Pricer");
-	private JTextField txtStockTicker = new JTextField(10);
 	private JTextField txtStockPrice = new JTextField(10);
 	private JTextField txtStrikePrice = new JTextField(10);
 	private JTextField txtVolatility = new JTextField(10);
@@ -23,9 +30,11 @@ public class OptionPricerPage {
 	private ButtonGroup buttonGroup = new ButtonGroup();
 	private JTextArea textResult = new JTextArea();
 	private DefaultListModel modelAlgorithms = new DefaultListModel();
+	@SuppressWarnings("unused")
 	private String[] algorithms = { "B-S formula", "Binomial tree",
 			"Numerical integration", "Simulation" };
 	private JList listAlgorithms = new JList(modelAlgorithms);
+
 	public OptionPricerPage() {
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -39,11 +48,15 @@ public class OptionPricerPage {
 		JPanel paneParaLabels = new JPanel(new GridLayout(0, 1, 1, 1));
 		JPanel paneParaTexts = new JPanel(new GridLayout(0, 1, 1, 1));
 
-		paneParaTexts.add(txtStockTicker);
+		txtStockPrice.setText("2.2");
 		paneParaTexts.add(txtStockPrice);
+		txtStrikePrice.setText("55");
 		paneParaTexts.add(txtStrikePrice);
+		txtVolatility.setText("3");
 		paneParaTexts.add(txtVolatility);
+		txtRiskFreeRate.setText("0.06");
 		paneParaTexts.add(txtRiskFreeRate);
+		txtTerms.setText("0.5");
 		paneParaTexts.add(txtTerms);
 		dropdownDesk.addActionListener(new updateAlgorithmAction());
 		paneParaTexts.add(dropdownDesk);
@@ -57,7 +70,6 @@ public class OptionPricerPage {
 		paneParaTexts.add(paneRadioButtons);
 
 		JLabel[] paraLabels = new JLabel[8];
-		paraLabels[0] = new JLabel("Stock Ticker");
 		paraLabels[1] = new JLabel("Stock Price");
 		paraLabels[2] = new JLabel("Strike Price");
 		paraLabels[3] = new JLabel("Volability");
@@ -65,7 +77,7 @@ public class OptionPricerPage {
 		paraLabels[5] = new JLabel("Terms (year)");
 		paraLabels[6] = new JLabel("Desk");
 		paraLabels[7] = new JLabel("Option");
-		for (int i = 0; i < 8; i++) {
+		for (int i = 1; i < 8; i++) {
 			paraLabels[i].setBorder(new EmptyBorder(10, 10, 10, 10));
 			paneParaLabels.add(paraLabels[i]);
 		}
@@ -135,6 +147,48 @@ public class OptionPricerPage {
 		jframe.setVisible(false);
 	}
 
+	private Option constructOption() {
+		Option option = null;
+
+		// build up the hard-coded select index
+		int selected = dropdownDesk.getSelectedIndex();
+		if (buttonCall.isSelected())
+			selected += 0;
+		else if (buttonPut.isSelected())
+			selected += 3;
+
+		switch (selected) {
+		case 0:
+			option = new AmericanCall();
+			break;
+		case 1:
+			option = new EuropeanCall();
+			break;
+		case 2:
+			option = new AsiaCall();
+			break;
+		case 3:
+			option = new AmericanPut();
+			break;
+		case 4:
+			option = new EuropeanPut();
+			break;
+		case 5:
+			option = new AsiaPut();
+			break;
+		default:
+			break;
+		}
+
+		option.setParas(Double.parseDouble(txtStockPrice.getText()),
+				Double.parseDouble(txtStrikePrice.getText()),
+				Double.parseDouble(txtVolatility.getText()),
+				Double.parseDouble(txtRiskFreeRate.getText()),
+				Double.parseDouble(txtTerms.getText()));
+
+		return option;
+	}
+
 	private class newAlgorithmAction implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			Main.newAlgorithmPage.display();
@@ -151,44 +205,7 @@ public class OptionPricerPage {
 
 		public void actionPerformed(ActionEvent arg0) {
 
-			Option option = null;
-
-			// build up the hard-coded select index
-			int selected = dropdownDesk.getSelectedIndex();
-			if (buttonCall.isSelected())
-				selected += 0;
-			else if (buttonPut.isSelected())
-				selected += 3;
-
-			switch (selected) {
-			case 0:
-				option = new AmericanCall();
-				break;
-			case 1:
-				option = new EuropeanCall();
-				break;
-			case 2:
-				option = new AsiaCall();
-				break;
-			case 3:
-				option = new AmericanPut();
-				break;
-			case 4:
-				option = new EuropeanPut();
-				break;
-			case 5:
-				option = new AsiaPut();
-				break;
-			default:
-				break;
-			}
-
-			option.setParas(txtStockTicker.getText(),
-					Double.parseDouble(txtStockPrice.getText()),
-					Double.parseDouble(txtStrikePrice.getText()),
-					Double.parseDouble(txtVolatility.getText()),
-					Double.parseDouble(txtRiskFreeRate.getText()),
-					Double.parseDouble(txtTerms.getText()));
+			Option option = constructOption();
 
 			Object[] selectedAlgorithm = listAlgorithms.getSelectedValues();
 			int numAlgorithms = selectedAlgorithm.length;
@@ -256,17 +273,43 @@ public class OptionPricerPage {
 				modelAlgorithms.addElement(validAlgorithms[i]);
 		}
 	}
-	
+
 	private class graphAction implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
-			final volatilitySmile graph = new volatilitySmile("Volatility Smile Graph");
+
+			try {
+				JFileChooser chooser = new JFileChooser();
+				int returnVal = chooser.showOpenDialog(jframe);
+				FileReader file = null;
+				FileWriter fw = new FileWriter("graphData.txt");
+				BufferedWriter bw = new BufferedWriter(fw);
+				String sCurrentLine = null;
+
+				file = new FileReader(chooser.getSelectedFile()
+						.getAbsolutePath());
+				BufferedReader br = new BufferedReader(file);
+				while ((sCurrentLine = br.readLine()) != null) {
+					bw.write(sCurrentLine + "\n");
+					System.out.println(sCurrentLine);
+				}
+				bw.close();
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			final VolatilitySmile graph = new VolatilitySmile(
+					"Volatility Smile Graph", constructOption());
 			graph.pack();
 			RefineryUtilities.centerFrameOnScreen(graph);
-			graph.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			graph.setVisible(true);
 		}
-	}	
+	}
 }

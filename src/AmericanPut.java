@@ -1,10 +1,8 @@
 public class AmericanPut extends Put {
 
-	public AmericanPut(String stockTicker, double stockPrice,
-			double strikePrice, double volatility, double riskFreeRate,
-			double time) {
-		super(stockTicker, stockPrice, strikePrice, volatility, riskFreeRate,
-				time);
+	public AmericanPut(double stockPrice, double strikePrice,
+			double volatility, double riskFreeRate, double time) {
+		super(stockPrice, strikePrice, volatility, riskFreeRate, time);
 		// TODO Auto-generated constructor stub
 	}
 
