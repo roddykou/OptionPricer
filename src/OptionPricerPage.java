@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import org.jfree.ui.RefineryUtilities;
+
 public class OptionPricerPage {
 
 	private JFrame jframe = new JFrame("Option Pricer");
@@ -24,7 +26,6 @@ public class OptionPricerPage {
 	private String[] algorithms = { "B-S formula", "Binomial tree",
 			"Numerical integration", "Simulation" };
 	private JList listAlgorithms = new JList(modelAlgorithms);
-
 	public OptionPricerPage() {
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -93,9 +94,12 @@ public class OptionPricerPage {
 		buttonNewAlgorithm.addActionListener(new newAlgorithmAction());
 		JButton buttonNewOptions = new JButton("Add New Options");
 		buttonNewOptions.addActionListener(new newOptionAction());
+		JButton buttonGraph = new JButton("Get Graph");
+		buttonGraph.addActionListener(new graphAction());
 		paneButtons.add(buttonCalculate);
 		paneButtons.add(buttonNewAlgorithm);
 		paneButtons.add(buttonNewOptions);
+		paneButtons.add(buttonGraph);
 
 		JPanel paneResults = new JPanel();
 		JPanel paneResult = new JPanel();
@@ -252,4 +256,17 @@ public class OptionPricerPage {
 				modelAlgorithms.addElement(validAlgorithms[i]);
 		}
 	}
+	
+	private class graphAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			final volatilitySmile graph = new volatilitySmile("Volatility Smile Graph");
+			graph.pack();
+			RefineryUtilities.centerFrameOnScreen(graph);
+			graph.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			graph.setVisible(true);
+		}
+	}	
 }
