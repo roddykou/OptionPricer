@@ -136,12 +136,57 @@ public class OptionPricerPage {
 	private class calculateAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent arg0) {
-			Option option = new Option(txtStockTicker.getText(), Double.parseDouble(txtStockPrice.getText()), 
-					Double.parseDouble(txtStrikePrice.getText()), Double.parseDouble(txtVolatility.getText()), 
-					Double.parseDouble(txtRiskFreeRate.getText()), Double.parseDouble(txtTerms.getText()));
-			System.out.println(option);
+
+			Option option = null;
+
+			// build up the hard-coded select index
+			int selected = dropdownDesk.getSelectedIndex();
+			if (buttonCall.isSelected())
+				selected += 0;
+			else if (buttonPut.isSelected())
+				selected += 3;
+
+			switch (selected) {
+			case 0:
+				option = new AmericanCall();
+				break;
+			case 1:
+				option = new EuropeanCall();
+				break;
+			case 2:
+				option = new AsiaCall();
+				break;
+			case 3:
+				option = new AmericanPut();
+				break;
+			case 4:
+				option = new EuropeanPut();
+				break;
+			case 5:
+				option = new AsiaPut();
+				break;
+			default:
+				break;
+			}
 			
+			option.setParas(txtStockTicker.getText(),
+					Double.parseDouble(txtStockPrice.getText()),
+					Double.parseDouble(txtStrikePrice.getText()),
+					Double.parseDouble(txtVolatility.getText()),
+					Double.parseDouble(txtRiskFreeRate.getText()),
+					Double.parseDouble(txtTerms.getText()));
+			
+//			BlackScholes black = new BlackScholes();
+//			System.out.println(black.eval(option));
+			
+//			Simulation simulation = new Simulation();
+//			System.out.println(simulation.eval(option));
+			
+			Binomial binomial = new Binomial();
+			System.out.println(binomial.eval(option));
 		}
 		
+		
+
 	}
 }
