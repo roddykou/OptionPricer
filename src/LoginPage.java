@@ -1,5 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -10,8 +12,10 @@ import javax.swing.JTextField;
 
 
 public class LoginPage {
-	public void display() {
-		JFrame jframe = new JFrame("Option Pricer Login");
+	
+	private JFrame jframe = new JFrame("Option Pricer Login");
+
+	public LoginPage() {
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JPanel panOuter = new JPanel(new BorderLayout());
@@ -40,6 +44,7 @@ public class LoginPage {
 		panTop.add(label);
 		
 		JButton loginButton = new JButton("Log in");
+		loginButton.addActionListener(new loginAction());      
 		panBottom.add(loginButton);
 		
 		JLabel labelUserID = new JLabel("UserID:");
@@ -55,6 +60,26 @@ public class LoginPage {
 		jframe.setContentPane(panOuter);
 		jframe.setSize(600, 200);
 		jframe.pack();
-		jframe.setVisible(true);
 	}
+	
+	public void display() {
+		jframe.setVisible(true);
+		
+	}
+	
+	public void hide() {
+		jframe.setVisible(false);
+	}
+	
+	private class loginAction implements ActionListener {
+		
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+            System.out.println("Login button clicked");
+			Main.optionPricerPage.display();
+			Main.loginPage.hide();
+		}
+	}
+
+	
 }

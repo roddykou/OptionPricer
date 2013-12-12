@@ -1,4 +1,6 @@
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -10,9 +12,9 @@ import javax.swing.JTextField;
 
 public class NewAlgorithmPage {
 	
-	public void display() {
-		JFrame jframe = new JFrame("Create a New Algorithm");
-		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private JFrame jframe = new JFrame("Create a New Algorithm");
+	
+	public NewAlgorithmPage() {
 		
 		JPanel panOuter = new JPanel(new BorderLayout());
 		
@@ -39,14 +41,27 @@ public class NewAlgorithmPage {
 		
 		JButton buttonUpload = new JButton("Upload and Return");
 		JButton buttonCancel = new JButton("Cancel");
+		buttonCancel.addActionListener(new cancelAction());
 		panBottom.add(buttonUpload, BorderLayout.WEST);
 		panBottom.add(buttonCancel, BorderLayout.EAST);
 		
 		jframe.setContentPane(panOuter);
 		jframe.setSize(600, 200);
 		jframe.pack();
-		jframe.setVisible(true);
 
 	}
 
+	public void display() {
+		jframe.setVisible(true);
+	}
+	
+	public void hide() {
+		jframe.setVisible(false);
+	}
+	
+	private class cancelAction implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			Main.newAlgorithmPage.hide();
+		}
+	}
 }
