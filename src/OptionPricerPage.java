@@ -20,9 +20,10 @@ public class OptionPricerPage {
 	private JRadioButton buttonPut = new JRadioButton("Put");
 	private ButtonGroup buttonGroup = new ButtonGroup();
 	private JTextArea textResult = new JTextArea();
+	private DefaultListModel modelAlgorithms = new DefaultListModel();
 	private String[] algorithms = { "B-S formula", "Binomial tree",
 			"Numerical integration", "Simulation" };
-	private JList listAlgorithms = new JList(algorithms);
+	private JList listAlgorithms = new JList(modelAlgorithms);
 
 	public OptionPricerPage() {
 		jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,8 +44,11 @@ public class OptionPricerPage {
 		paneParaTexts.add(txtVolatility);
 		paneParaTexts.add(txtRiskFreeRate);
 		paneParaTexts.add(txtTerms);
+		dropdownDesk.addActionListener(new updateAlgorithmAction());
 		paneParaTexts.add(dropdownDesk);
 		JPanel paneRadioButtons = new JPanel();
+		buttonCall.addActionListener(new updateAlgorithmAction());
+		buttonPut.addActionListener(new updateAlgorithmAction());
 		paneRadioButtons.add(buttonCall, BorderLayout.WEST);
 		paneRadioButtons.add(buttonPut, BorderLayout.EAST);
 		buttonGroup.add(buttonCall);
@@ -74,6 +78,10 @@ public class OptionPricerPage {
 		JPanel paneAlgorithm = new JPanel();
 		paneAlgorithm.setBorder(BorderFactory.createTitledBorder("Algorithm"));
 
+		modelAlgorithms.addElement("B-S formula");
+		modelAlgorithms.addElement("Binomial tree");
+		modelAlgorithms.addElement("Numerical integration");
+		modelAlgorithms.addElement("Simulation");
 		paneAlgorithm.add(listAlgorithms);
 
 		JPanel paneButtons = new JPanel();
@@ -184,17 +192,64 @@ public class OptionPricerPage {
 
 			for (int i = 0; i < numAlgorithms; i++) {
 				if (selectedAlgorithm[i].toString().equals("B-S formula"))
-					results += "B-S formula: " + new BlackScholes().eval(option) + "\n";
-				else if (selectedAlgorithm[i].toString().equals("Binomial tree"))
-					results += "Binomial tree: " + new Binomial().eval(option) + "\n";
-				else if (selectedAlgorithm[i].toString().equals("Numerical integration"))
+					results += "B-S formula: "
+							+ new BlackScholes().eval(option) + "\n";
+				else if (selectedAlgorithm[i].toString()
+						.equals("Binomial tree"))
+					results += "Binomial tree: " + new Binomial().eval(option)
+							+ "\n";
+				else if (selectedAlgorithm[i].toString().equals(
+						"Numerical integration"))
 					results += "Numerical integration: " + 0.0 + "\n";
 				else if (selectedAlgorithm[i].toString().equals("Simulation"))
-					results += "Simulation: " + new Simulation().eval(option) + "\n";
+					results += "Simulation: " + new Simulation().eval(option)
+							+ "\n";
 			}
 
-			 textResult.setText(results);
+			textResult.setText(results);
 		}
 
+	}
+
+	private class updateAlgorithmAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			String[] validAlgorithms = null;
+
+			// build up the hard-coded select index
+			int selected = dropdownDesk.getSelectedIndex();
+			if (buttonCall.isSelected())
+				selected += 0;
+			else if (buttonPut.isSelected())
+				selected += 3;
+
+			switch (selected) {
+			case 0:
+				validAlgorithms = AmericanCall.validAlgos;
+				break;
+			case 1:
+				validAlgorithms = EuropeanCall.validAlgos;
+				break;
+			case 2:
+				validAlgorithms = AsiaCall.validAlgos;
+				break;
+			case 3:
+				validAlgorithms = AmericanPut.validAlgos;
+				break;
+			case 4:
+				validAlgorithms = EuropeanPut.validAlgos;
+				break;
+			case 5:
+				validAlgorithms = AsiaPut.validAlgos;
+				break;
+			default:
+				break;
+			}
+
+			modelAlgorithms.removeAllElements();
+			for (int i = 0; i < validAlgorithms.length; i++)
+				modelAlgorithms.addElement(validAlgorithms[i]);
+		}
 	}
 }

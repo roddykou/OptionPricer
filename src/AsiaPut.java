@@ -11,4 +11,5 @@ public class AsiaPut extends Put{
 		// TODO Auto-generated constructor stub
 	}
 
+	public final static String[] validAlgos = {"Simulation" };
 }

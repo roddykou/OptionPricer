@@ -11,5 +11,8 @@ public class EuropeanCall extends Call{
 	public EuropeanCall() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	public final static String[] validAlgos = { "B-S formula", "Binomial tree",
+		"Numerical integration", "Simulation" };
 
 }
